@@ -1,0 +1,260 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2024 by Lukas Heindl <oss.heindl+latex@protonmail.com>
+% ---------------------------------------------------------------------------
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in
+%   http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of LaTeX
+% version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The Current Maintainer of this work is Lukas Heindl.
+%
+% This work consists of the files packetprinting.dtx and packetprinting.ins
+% and the derived filebase packetprinting.sty.
+%
+% \fi
+%
+% \iffalse
+%<*driver>
+\ProvidesFile{packetprinting.dtx}
+%</driver>
+%<package>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
+%<package>\ProvidesPackage{packetprinting}
+%<*package>
+    [2024/05/29 v.0.1.0 <package printing with nnicematrix and tikz>]
+%</package>
+%
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage{packetprinting}
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\begin{document}
+  \DocInput{packetprinting.dtx}
+  \PrintChanges
+  \PrintIndex
+\end{document}
+%</driver>
+% \fi
+%
+% \CheckSum{37}
+%
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
+%
+% \changes{v.0.1.0}{2024/05/29}{Converted to DTX file}
+%
+% \DoNotIndex{
+%   \newcommand,\newenvironment,\NewDocumentCommand,\begin,\end,
+%   \directlua,\newlength,\NiceMatrixLastEnv,\pgfkeys,\pgfkeysvalueof,
+%   \usetikzlibrary,\setlength,\RequirePackage
+% }
+%
+% \providecommand*{\url}{\texttt}
+% \GetFileInfo{packetprinting.dtx}
+% \title{The \textsf{packetprinting} package}
+% \author{Lukas Heindl \\ \url{oss.heindl+latex@protonmail.com}}
+% \date{\fileversion~from \filedate}
+%
+% \maketitle
+%
+% \section{Introduction}
+%
+% This packet is quite similar to
+% \emph{bytefield}\footnote{\url{https://ctan.org/pkg/bytefield}} but I wasn't
+% aware of that packet at the time writing this. The main difference is that
+% this packet uses a different style (alternating background colors to easy
+% read out the offsets). Also as it uses tikz to draw the contents you are
+% quite flexible to add further items to the packet (like arrows etc.).
+%
+% \section{Usage}
+%
+% Load this package as |\usepackage{packetprinting}|.
+%
+% \DescribeEnv{packetprinting} |\begin{packetprinting}[opts]...\end{packetprinting}|\\
+% This is the core environment of this package. Within it you can use
+% |\addField| and |\skipRow|. At its end it will also draw the packet table.
+%
+% Before printing the table, the environment will set |\tabcolsep| to
+% |\packetcolsep| (new length defined by this package).
+%
+% |opts| are optional arguments (enclosed with |{}|) separated with |,|:
+% \begin{description}
+%     \item[|cols|] Amount of columns you want per line.
+%     \textit{Default: |32|}
+%     \item[|scale|] If you want a slim table and\,/\,or want many columns per
+%     line, you might not want every column drawn. With this parameter you can
+%     specify e.\,g.\, that only every second column should be shown.
+%     \textit{Default: |1|}
+%     \textbf{Note:} |cols| needs to be a multiple of |scale|!
+%     \item[|hideHeader|] Whether to print the header with the bit numbers or not.
+% \end{description}
+%
+% \DescribeMacro{\addField}    |\addField[opts]|
+%
+% |opts| are optional arguments (enclosed with |{}|) separated with |,|:
+% \begin{description}
+%     \item[|from|] Bit-index where the field shall start.
+%     \item[|to|] Bit-index where the field shall end.
+%     \item[|node|] name of the node fitting the complete field which can be
+%     used for further reference (e.\,g\, in a tikzpicture with
+%     |remember picture| set).
+%     \textit{Default: |"default"|}
+%     \item[|c1|] Content to write into the field.
+%     \textit{Default:} |""|
+%     \item[|c2|] If the field spans multiple rows, this is the content to
+%     write into the last row of the field.
+%     \textit{Default:} |""|
+%     \item[|c3|] If the field spans multiple rows, this is the content to
+%     write into the middle rows of the field.
+%     \textit{Default:} |""|
+% \end{description}
+% Hint: |from| and |to| are evaluated as lua expression, so you can also do some
+% calculations here (like: |8*2-1|).
+%
+% \DescribeMacro{\skipRow}    |\skipRow[opts]|
+% This commands allows to collapse long fields (populating many lines) by
+% skipping some lines and placing a $\approx$ sign at the end of the last line
+% before skipping.
+%
+% |opts| are optional arguments (enclosed with |{}|) separated with |,|:
+% \begin{description}
+%     \item[|from|] Row which to skip from
+%     \item[|to|] Row which to skip to
+% \end{description}
+% \textbf{Note:} |from| and |to| are given as bit-offsets. Also note that you
+% cannot include the first and last row of a field in the collapsed section.
+%
+% \section{Examples}
+% \subsection{Example 1}
+% \begin{packetprinting}[hideHeader]
+%     \addField[from=0,      to=6*8-1,  node=dst,  c1=Destination Address]
+%     \addField[from=6*8,    to=12*8,   node=xsrc, c1=Source Address, c3=additional, c2=x]
+%     \addField[from=12*8+1, to=16*8-1, node=type, c1={\unexpanded{\textbf{Ethertype}}}]
+% \end{packetprinting}
+% \begin{tikzpicture}[overlay,remember picture]
+%     \path (type.south) edge[blue,<-] node[black,pos=1,below] {Type of the encapsulated packet} ($(type.south) + (1,-.5)$);
+% \end{tikzpicture}
+% \vspace*{\dimexpr\baselineskip+.5cm}
+%
+% \subsection{Example 2}
+% \begin{packetprinting}[]
+%     \addField[from=0,  to=3,   node=xversion, c1={Version}]
+%     \addField[from=4,  to=11,  node=xtraf,    c1={Traffic Class}]
+%     \addField[from=12, to=31,  node=xflow,    c1={Flow Label}]
+%     \addField[from=32, to=47,  node=xlength,  c1={Payload Length}]
+%     \addField[from=48, to=55,  node=xnh,      c1={Next Header}]
+%     \addField[from=56, to=63,  node=xhop,     c1={Hop Limit}]
+%     \addField[from=64, to=191, node=xsrc,     c1={Source Address}]
+%     \addField[from=192,to=319, node=xdst,     c1={Destination Address}]
+%     \skipRow[from=64+4*8, to=191-4*8]
+%     \skipRow[from=192+4*8, to=319-4*8]
+% \end{packetprinting}
+
+%
+% \StopEventually{}
+%
+% \section{Implementation}
+%
+% \iffalse
+%<*package>
+% \fi
+%
+%    \begin{macrocode}
+\RequirePackage{tikz}
+\usetikzlibrary{calc,fit}
+\RequirePackage{pgfkeys}
+\RequirePackage{nicematrix}
+\RequirePackage{luapackageloader} % use the default lua path as well
+\directlua{pp = require("packetprinting")}
+\pgfkeys{
+    /packetprinting/env/.cd,
+    cols/.initial=32,
+    scale/.initial=1,
+    hideHeader/.initial=false, hideHeader/.default=true,
+%    \end{macrocode}
+%    \begin{macrocode}
+    /packetprinting/skip/.cd,
+    from/.initial=0, from/.value required,
+    to/.initial=0, to/.value required,
+%    \end{macrocode}
+%    \begin{macrocode}
+    /packetprinting/cmd/.cd,
+    from/.initial=0, from/.value required,
+    to/.initial=8, to/.value required,
+    node/.initial={default},
+    c1/.initial={},
+    c2/.initial={},
+    c3/.initial={},
+}
+%    \end{macrocode}
+%
+% \begin{environment}{packetprinting}
+%    \begin{macrocode}
+\newlength{\packetcolsep}
+\setlength{\packetcolsep}{1pt}
+\newenvironment{packetprinting}[1][]{%
+    \pgfkeys{/packetprinting/env/.cd,#1}%
+    \directlua{pp.reset(%
+        \pgfkeysvalueof{/packetprinting/env/cols},%
+        \pgfkeysvalueof{/packetprinting/env/scale}%
+    )}%
+    \NewDocumentCommand{\skipRow}{O{}}{%
+        \pgfkeys{/packetprinting/skip/.cd,##1}%
+        \directlua{%
+            pp.skip(%
+                \pgfkeysvalueof{/packetprinting/skip/from},%
+                \pgfkeysvalueof{/packetprinting/skip/to}%
+            )%
+        }%
+    }%
+    \NewDocumentCommand{\addField}{O{}}{%
+        \pgfkeys{/packetprinting/cmd/.cd,##1}%
+        \directlua{%
+            pp.collect(%
+                \pgfkeysvalueof{/packetprinting/cmd/from},%
+                \pgfkeysvalueof{/packetprinting/cmd/to},%
+                [[\pgfkeysvalueof{/packetprinting/cmd/node}]],%
+                [[\pgfkeysvalueof{/packetprinting/cmd/c1}]],%
+                [[\pgfkeysvalueof{/packetprinting/cmd/c2}]],%
+                [[\pgfkeysvalueof{/packetprinting/cmd/c3}]]%
+            )%
+        }%
+    }%
+}{%
+    \directlua{pp.drawTab(\pgfkeysvalueof{/packetprinting/env/hideHeader})}%
+    \begin{tikzpicture}[remember picture, overlay]%
+        \directlua{pp.drawTikz()}%
+    \end{tikzpicture}%
+}%
+%    \end{macrocode}
+% \end{environment}
+%
+
+%
+% \iffalse
+%</package>
+% \fi
+%
+% \Finale
+\endinput
